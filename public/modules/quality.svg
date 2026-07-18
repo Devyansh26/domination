@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#0a0e1a"/>
+  <text x="400" y="280" font-family="system-ui, sans-serif" font-size="48" font-weight="300" fill="#00d4aa" text-anchor="middle">QUALITY ASSURANCE</text>
+  <text x="400" y="340" font-family="system-ui, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">Automated Chart Review</text>
+  <rect x="280" y="380" width="240" height="80" rx="8" fill="#00d4aa" opacity="0.15" stroke="#00d4aa" stroke-width="2"/>
+  <text x="400" y="425" font-family="system-ui, sans-serif" font-size="32" font-weight="700" fill="#00d4aa" text-anchor="middle">100%</text>
+  <text x="400" y="455" font-family="system-ui, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">Review Coverage</text>
+  <path d="M320 480 L380 420 L440 480" stroke="#00d4aa" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

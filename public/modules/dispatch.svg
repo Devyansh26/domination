@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#0a0e1a"/>
+  <text x="400" y="280" font-family="system-ui, sans-serif" font-size="48" font-weight="300" fill="#00d4aa" text-anchor="middle">DYNAMIC DISPATCH</text>
+  <text x="400" y="340" font-family="system-ui, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">Real-time Fleet Optimization</text>
+  <path d="M200 420 Q300 320 400 420 Q500 520 600 420" stroke="#00d4aa" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+  <circle cx="300" cy="380" r="12" fill="#00d4aa" opacity="0.8"/>
+  <circle cx="400" cy="350" r="12" fill="#00d4aa" opacity="0.8"/>
+  <circle cx="500" cy="380" r="12" fill="#00d4aa" opacity="0.8"/>
+</svg>

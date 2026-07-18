@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#0a0e1a"/>
+  <text x="400" y="280" font-family="system-ui, sans-serif" font-size="48" font-weight="300" fill="#00d4aa" text-anchor="middle">PREDICTIVE ANALYTICS</text>
+  <text x="400" y="340" font-family="system-ui, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">Spatiotemporal Forecasting</text>
+  <polyline points="100,500 180,420 260,460 340,380 420,420 500,340 580,380 660,300 700,280" stroke="#00d4aa" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="700" cy="280" r="10" fill="#00d4aa"/>
+  <text x="710" y="285" font-family="system-ui, sans-serif" font-size="14" fill="#00d4aa">89%</text>
+</svg>
