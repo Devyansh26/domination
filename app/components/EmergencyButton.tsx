@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, ChevronDown, MapPin, Phone, X } from "lucide-react";
+import { AlertTriangle, ChevronDown } from "lucide-react";
 
 export function EmergencyButton({ 
   onClick, 
@@ -19,6 +19,8 @@ export function EmergencyButton({
   const [isPressed, setIsPressed] = useState(false);
   const [pulse, setPulse] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setPulse(p => !p), 2000);
@@ -40,12 +42,20 @@ export function EmergencyButton({
       e.preventDefault();
       handleClick(e as unknown as React.MouseEvent);
     }
+    if (e.key === "Escape") {
+      setIsDropdownOpen(false);
+    }
   };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (isDropdownOpen && !(e.target as Node)) return;
-      setIsDropdownOpen(false);
+      if (isDropdownOpen && 
+          dropdownRef.current && 
+          !dropdownRef.current.contains(e.target as Node) &&
+          buttonRef.current && 
+          !buttonRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
     };
     if (isDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -53,9 +63,12 @@ export function EmergencyButton({
     }
   }, [isDropdownOpen]);
 
+  const closeDropdown = () => setIsDropdownOpen(false);
+
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" ref={dropdownRef}>
       <motion.button
+        ref={buttonRef}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseEnter={() => setIsHovered(true)}
@@ -112,7 +125,7 @@ export function EmergencyButton({
         </div>
       </motion.button>
 
-      {showDropdown && dropdownContent && (
+      {showDropdown && dropdownContent && isDropdownOpen && (
         <motion.div
           initial={{ opacity: 0, y: -10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
