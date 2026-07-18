@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 @theme inline {
   --color-background: #0a0e1a;
@@ -9,6 +10,14 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.2);
   --color-border-bright: rgba(255, 255, 255, 0.8);
+
+  /* Light Blue Theme */
+  --color-primary: #3b82f6;
+  --color-primary-light: #60a5fa;
+  --color-primary-dark: #2563eb;
+  --color-primary-muted: #93c5fd;
+  --color-primary-bg: rgba(59, 130, 246, 0.1);
+  --color-primary-border: rgba(59, 130, 246, 0.2);
 
   /* Body system accent colors — muted, desaturated */
   --color-system-skin: #8a7d6b;

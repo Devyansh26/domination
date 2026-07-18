@@ -73,24 +73,23 @@ function FigureLayer({
   reducedMotion: boolean;
 }) {
   // Figure i reveals during scroll segment (i+1), synced with its info panel
-  const segmentStart = (index + 0.5) / SEGMENTS;
-  const segmentEnd = (index + 1.2) / SEGMENTS;
+  // First image (index 0) should appear when first system section reaches (segment 1)
+  // Match the transition duration of others: range of ~0.7/SEGMENTS
+  const segmentStart = index === 0 ? 1 / SEGMENTS : (index + 0.5) / SEGMENTS;
+  const segmentEnd = index === 0 ? 1.7 / SEGMENTS : (index + 1.2) / SEGMENTS;
+  const baseScale = 1.6;
 
   const opacity = useTransform(
     scrollYProgress,
-    [segmentStart, segmentEnd],
-    [0, 1]
+    index === 0 ? [0, segmentStart, segmentEnd] : [segmentStart, segmentEnd],
+    index === 0 ? [0, 0, 1] : [0, 1]
   );
-  // Slide in from the left: starts off-screen left, lands at its stacked offset
-  const xOffset = index * 20; // final resting position (px offset rightward)
-  const x = useTransform(
-    scrollYProgress,
-    [segmentStart, segmentEnd],
-    [-80, xOffset]
-  );
+  const spread = 384;
+  const xOffset =
+    TOTAL === 1 ? 0 : (index / (TOTAL - 1)) * spread - spread / 2;
 
   // First image = highest z-index (in front), last = lowest (behind)
-  const zIndex = TOTAL - index;
+  const zIndex = index + 1;
 
   return (
     <motion.div
@@ -98,8 +97,8 @@ function FigureLayer({
       style={{
         zIndex,
         ...(reducedMotion
-          ? { transform: `translateX(${xOffset}px)` }
-          : { opacity, x }),
+          ? { transform: `translateX(${xOffset}px) scale(${baseScale})`, opacity }
+          : { opacity, x: xOffset, scale: baseScale }),
       }}
     >
       <div className="relative w-full h-full">
@@ -172,7 +171,7 @@ export function HeroSection() {
           {/* Title block */}
           <div className="h-screen flex items-center">
             <div>
-              <p className="label-caps mb-5">Problem Code MED-03</p>
+              <p className="label-caps mb-5">Problem Code MED-02</p>
               <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-light tracking-tight text-foreground-bright mb-6 leading-tight">
                 Health Emergency
                 <br />
