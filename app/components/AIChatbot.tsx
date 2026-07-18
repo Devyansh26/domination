@@ -147,12 +147,19 @@ export function AIChatbot() {
             m.id === assistantId ? { ...m, content: accumulated, isStreaming: false } : m
           )
         );
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-        const errorText =
-          err instanceof Error && err.message.includes("API key")
-            ? "⚠️ API key not configured. Add `GEMINI_API_KEY` to `.env.local` and restart the server."
-            : "Sorry, I encountered an error. Please try again.";
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        
+        let errorText = "Sorry, I encountered an error. Please try again.";
+        
+        if (err.message.includes("API key")) {
+          errorText = "⚠️ API key not configured. Add `GEMINI_API_KEY` to `.env.local` and restart the server.";
+        } else if (err.message.includes("Rate limit") || err.message.includes("429") || err.message.includes("Too Many Requests")) {
+          errorText = "⚠️ Rate limit exceeded. The free tier quota has been reached. Please wait a moment and try again.";
+        } else {
+          errorText = `⚠️ Error: ${err.message}`;
+        }
+        
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId

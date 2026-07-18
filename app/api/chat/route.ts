@@ -40,12 +40,12 @@ export async function POST(request: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: SYSTEM_PROMPT,
     });
 
     // Convert messages to Gemini history format
-    // The last message is the user's current prompt
+    // The last message is the user's current  prompt
     const history = messages.slice(0, -1).map((msg: { role: string; content: string }) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
@@ -80,8 +80,16 @@ export async function POST(request: Request) {
         "X-Content-Type-Options": "nosniff",
       },
     });
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Chat API error:", error);
+    
+    // Check if it's a rate limit error
+    if (error.status === 429 || error.message?.includes('429')) {
+      return Response.json({ 
+        error: "Rate limit exceeded on the free tier. Please wait about 30 seconds and try again." 
+      }, { status: 429 });
+    }
+    
     const message = error instanceof Error ? error.message : "Unknown error";
     return Response.json({ error: `Failed to get AI response: ${message}` }, { status: 500 });
   }
