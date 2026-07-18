@@ -51,6 +51,9 @@ const SYSTEMS = [
 const TOTAL = SYSTEMS.length;
 // Total scroll segments: 1 title screen + 1 per system
 const SEGMENTS = TOTAL + 1;
+const ORB_FADE_START = 0;
+const ORB_FADE_DURATION = 0.1;
+const ORB_FADE_END = ORB_FADE_START + ORB_FADE_DURATION;
 
 /* ────────────────────────────────────────────
    FIGURE LAYER
@@ -72,18 +75,12 @@ function FigureLayer({
   scrollYProgress: MotionValue<number>;
   reducedMotion: boolean;
 }) {
-  // Figure i reveals during scroll segment (i+1), synced with its info panel
-  // First image (index 0) should appear when first system section reaches (segment 1)
-  // Match the transition duration of others: range of ~0.7/SEGMENTS
-  const segmentStart = index === 0 ? 1 / SEGMENTS : (index + 0.5) / SEGMENTS;
-  const segmentEnd = index === 0 ? 1.7 / SEGMENTS : (index + 1.2) / SEGMENTS;
+  // Each figure appears as its corresponding section arrives.
+  const segmentStart = index === 0 ? ORB_FADE_END : (index + 1) / SEGMENTS;
+  const segmentEnd = segmentStart + 0.7 / SEGMENTS;
   const baseScale = 1.6;
 
-  const opacity = useTransform(
-    scrollYProgress,
-    index === 0 ? [0, segmentStart, segmentEnd] : [segmentStart, segmentEnd],
-    index === 0 ? [0, 0, 1] : [0, 1]
-  );
+  const opacity = useTransform(scrollYProgress, [segmentStart, segmentEnd], [0, 1]);
   const spread = 384;
   const xOffset =
     TOTAL === 1 ? 0 : (index / (TOTAL - 1)) * spread - spread / 2;
@@ -95,7 +92,7 @@ function FigureLayer({
     <motion.div
       className="absolute inset-0 flex items-center justify-center"
       style={{
-        zIndex,
+        zIndex: zIndex + 20,
         ...(reducedMotion
           ? { transform: `translateX(${xOffset}px) scale(${baseScale})`, opacity }
           : { opacity, x: xOffset, scale: baseScale }),
@@ -111,6 +108,44 @@ function FigureLayer({
           priority={index < 2}
         />
       </div>
+    </motion.div>
+  );
+}
+
+function FigureBackdropVideo({
+  scrollYProgress,
+}: {
+  scrollYProgress: MotionValue<number>;
+}) {
+  const videoOpacity = useTransform(
+    scrollYProgress,
+    [0, ORB_FADE_START, ORB_FADE_END],
+    [1, 1, 0]
+  );
+  const videoVisibility = useTransform(scrollYProgress, (value) =>
+    value >= ORB_FADE_END ? "hidden" : "visible"
+  );
+
+  return (
+    <motion.div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        zIndex: 1,
+        opacity: videoOpacity,
+        visibility: videoVisibility,
+      }}
+    >
+      <video
+        className="h-full w-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      >
+        <source src="/orb-purple.webm" type="video/webm" />
+      </video>
     </motion.div>
   );
 }
@@ -136,10 +171,17 @@ export function HeroSection() {
     <section ref={sectionRef}>
       <div className="flex flex-col md:flex-row">
         {/* ─── LEFT: Sticky figure stack ─── */}
-        <div className="md:w-[45%] lg:w-1/2 md:flex-shrink-0">
-          <div className="sticky top-0 h-screen overflow-hidden">
+        <div
+          className="md:w-[45%] lg:w-1/2 md:flex-shrink-0 md:min-h-[calc(var(--hero-segments)*100vh)]"
+          style={{ ["--hero-segments" as string]: String(SEGMENTS) }}
+        >
+          <div className="sticky top-0 h-screen overflow-hidden isolate">
             {/* Bottom gradient for depth */}
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a0e1a] to-transparent z-[60] pointer-events-none" />
+
+            <FigureBackdropVideo
+              scrollYProgress={scrollYProgress}
+            />
 
             {/* Figures — all stacked absolutely */}
             {SYSTEMS.map((system, i) => (

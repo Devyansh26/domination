@@ -78,7 +78,7 @@ export function Header() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </motion.div>
-              <span className="font-serif text-xl font-semibold text-white tracking-tight hidden sm:block">
+              <span className="text-sm font-medium text-slate-300/80 hover:text-white tracking-tight hidden sm:block transition-colors">
                 EmerGen
               </span>
             </Link>
