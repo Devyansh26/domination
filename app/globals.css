@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #0a0e1a;
+  --color-foreground: #c8ccd4;
+  --color-foreground-muted: #6b7280;
+  --color-foreground-bright: #e8eaf0;
+  --color-surface: #0f1320;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.2);
+  --color-border-bright: rgba(255, 255, 255, 0.8);
+
+  /* Body system accent colors — muted, desaturated */
+  --color-system-skin: #8a7d6b;
+  --color-system-muscular: #6b3a3a;
+  --color-system-skeletal: #a0a0a0;
+  --color-system-nervous: #5a6b4a;
+  --color-system-digestive: #7a6b4a;
+  --color-system-circulatory: #5a3a3a;
+  --color-system-lymphatic: #4a5a3a;
+
+  --font-heading: var(--font-ibm-plex-serif);
+  --font-body: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ───── Base resets ───── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0a0e1a;
+  color: #c8ccd4;
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(200, 204, 212, 0.15);
+  color: #e8eaf0;
+}
+
+/* ───── Scrollbar ───── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ───── Utility classes ───── */
+
+.hairline-border {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.label-caps {
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b7280;
 }
