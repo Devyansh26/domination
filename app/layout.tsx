@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "./components/Header";
+import { AIChatbot } from "./components/AIChatbot";
 
 const ibmPlexSerif = IBM_Plex_Serif({
   variable: "--font-ibm-plex-serif",
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0a0e1a] text-white">
         <Header />
         <main id="main-content">{children}</main>
+        <AIChatbot />
       </body>
     </html>
   );
