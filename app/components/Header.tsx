@@ -66,6 +66,7 @@ export function Header() {
     >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
         <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2" aria-label="Health Emergency Response Portal Home">
               <motion.div
@@ -78,12 +79,13 @@ export function Header() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </motion.div>
-              <span className="text-sm font-medium text-slate-300/80 hover:text-white tracking-tight hidden sm:block transition-colors">
+              <span className="text-sm font-medium text-slate-300/80 hover:text-white tracking-tight transition-colors">
                 EmerGen
               </span>
             </Link>
           </div>
 
+          {/* Desktop nav links */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <motion.div
@@ -115,15 +117,19 @@ export function Header() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center space-x-4">
-            <EmergencyButton
-              onClick={() => window.location.href = "/emergency-contacts"}
-              showDropdown
-              dropdownContent={dropdownItems}
-            />
+          {/* Right side: emergency button (desktop) + hamburger (mobile) */}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <EmergencyButton
+                onClick={() => window.location.href = "/emergency-contacts"}
+                showDropdown
+                dropdownContent={dropdownItems}
+              />
+            </div>
+            {/* Mobile hamburger — always visible on small screens */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 text-slate-300 hover:text-white transition-colors"
+              className="md:hidden p-2 text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-white/5"
               aria-label="Open menu"
               aria-expanded={isMobileMenuOpen}
             >

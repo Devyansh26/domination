@@ -23,25 +23,25 @@ export function CTASection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Link
             href="/emergency-contacts"
-            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+            className="w-full sm:w-auto text-center px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
           >
             Emergency Contacts
           </Link>
           <Link
             href="/healthcare-facilities"
-            className="px-8 py-3 bg-gradient-to-r from-blue-400 to-blue-500 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+            className="w-full sm:w-auto text-center px-8 py-3.5 bg-gradient-to-r from-blue-400 to-blue-500 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
           >
             Healthcare Facilities
           </Link>
           <Link
             href="/medical-info"
-            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-400 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-600 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+            className="w-full sm:w-auto text-center px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-400 text-white text-sm tracking-widest uppercase transition-all duration-300 rounded-lg hover:from-blue-600 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
           >
             Medical Info
           </Link>
         </div>
 
-        <button className="px-8 py-3 border border-white/[0.2] text-foreground-muted bg-transparent text-sm tracking-widest uppercase transition-colors duration-300 hover:border-white/[0.8] hover:text-foreground-bright rounded-none">
+        <button className="w-full sm:w-auto px-8 py-3.5 border border-white/[0.2] text-foreground-muted bg-transparent text-sm tracking-widest uppercase transition-colors duration-300 hover:border-white/[0.8] hover:text-foreground-bright rounded-none">
           Get Started
         </button>
       </motion.div>

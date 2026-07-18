@@ -113,13 +113,13 @@ export function Footer() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-12 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4"
+          className="mt-12 pt-6 md:pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
         >
-          <p className="text-xs text-foreground-muted">
+          <p className="text-xs text-foreground-muted text-center md:text-left">
             © 2026 Health Emergency Response Portal — MED-02
           </p>
-          <p className="text-xs text-foreground-muted">
+          <p className="text-xs text-foreground-muted text-center md:text-right">
             Built for rapid emergency access. Not a substitute for professional medical advice.
           </p>
         </motion.div>

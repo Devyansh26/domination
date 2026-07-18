@@ -81,7 +81,8 @@ function FigureLayer({
   const baseScale = 1.6;
 
   const opacity = useTransform(scrollYProgress, [segmentStart, segmentEnd], [0, 1]);
-  const spread = 384;
+  // Reduce spread on mobile by using a smaller value; CSS clamp not available here, so we cap to reasonable desktop spread
+  const spread = 320;
   const xOffset =
     TOTAL === 1 ? 0 : (index / (TOTAL - 1)) * spread - spread / 2;
 
@@ -169,8 +170,94 @@ export function HeroSection() {
 
   return (
     <section ref={sectionRef}>
-      <div className="flex flex-col md:flex-row">
-        {/* ─── LEFT: Sticky figure stack ─── */}
+      {/* ─── Mobile layout: stacked (figure on top, text below) ─── */}
+      <div className="flex flex-col md:hidden">
+        {/* Mobile figure panel — fixed aspect ratio, not sticky */}
+        <div className="relative w-full h-[60vw] min-h-[260px] max-h-[420px] overflow-hidden isolate">
+          <FigureBackdropVideo scrollYProgress={scrollYProgress} />
+          {SYSTEMS.map((system, i) => (
+            <FigureLayer
+              key={system.key}
+              system={system}
+              index={i}
+              scrollYProgress={scrollYProgress}
+              reducedMotion={reducedMotion}
+            />
+          ))}
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#0a0e1a] to-transparent z-[60] pointer-events-none" />
+          {/* Progress dots */}
+          <div className="absolute bottom-3 left-0 right-0 z-[60] flex justify-center gap-2.5">
+            {SYSTEMS.map((system, i) => (
+              <FigureDot
+                key={system.key}
+                index={i}
+                scrollYProgress={scrollYProgress}
+                reducedMotion={reducedMotion}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile text column */}
+        <div className="px-6 py-8">
+          {/* Title block */}
+          <div className="mb-12">
+            <p className="label-caps mb-4">Problem Code MED-02</p>
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground-bright mb-5 leading-tight">
+              Health Emergency
+              <br />
+              Response Portal
+            </h1>
+            <p className="text-sm text-foreground-muted leading-relaxed mb-6">
+              Rapid access to critical medical systems and emergency
+              resources. Scroll to explore the layers of the human body that
+              our platform helps protect.
+            </p>
+            <div className="flex items-center gap-3 text-foreground-muted/40">
+              <motion.div
+                className="w-px h-8 bg-white/[0.2]"
+                animate={{ scaleY: [1, 0.5, 1] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                style={{ originY: 0 }}
+              />
+              <span className="label-caps text-[0.55rem]">Scroll to explore</span>
+            </div>
+          </div>
+
+          {/* System info panels — stacked, each with generous padding */}
+          {SYSTEMS.map((system, i) => (
+            <motion.div
+              key={system.key}
+              className="py-10 border-t border-white/[0.06]"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <p className="label-caps mb-3 text-white/20">
+                {String(i + 1).padStart(2, "0")} / {String(TOTAL).padStart(2, "0")}
+              </p>
+              <h2 className="font-heading text-xl font-light tracking-tight text-foreground-bright mb-4">
+                {system.label}
+              </h2>
+              <p className="text-sm text-foreground-muted leading-relaxed">
+                {system.description}
+              </p>
+              <div className="mt-6 w-10 h-px bg-white/[0.12]" />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── Desktop layout: side-by-side sticky scroll ─── */}
+      <div className="hidden md:flex flex-row"
+        style={{ ["--hero-segments" as string]: String(SEGMENTS) }}
+      >
+        {/* Left: Sticky figure stack */}
         <div
           className="md:w-[45%] lg:w-1/2 md:flex-shrink-0 md:min-h-[calc(var(--hero-segments)*100vh)]"
           style={{ ["--hero-segments" as string]: String(SEGMENTS) }}
@@ -179,9 +266,7 @@ export function HeroSection() {
             {/* Bottom gradient for depth */}
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a0e1a] to-transparent z-[60] pointer-events-none" />
 
-            <FigureBackdropVideo
-              scrollYProgress={scrollYProgress}
-            />
+            <FigureBackdropVideo scrollYProgress={scrollYProgress} />
 
             {/* Figures — all stacked absolutely */}
             {SYSTEMS.map((system, i) => (
@@ -208,7 +293,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* ─── RIGHT: Scrolling text ─── */}
+        {/* Right: Scrolling text */}
         <div className="md:w-[55%] lg:w-1/2 md:flex-shrink-0 px-8 md:px-12 lg:px-20">
           {/* Title block */}
           <div className="h-screen flex items-center">
@@ -235,9 +320,7 @@ export function HeroSection() {
                   }}
                   style={{ originY: 0 }}
                 />
-                <span className="label-caps text-[0.55rem]">
-                  Scroll to explore
-                </span>
+                <span className="label-caps text-[0.55rem]">Scroll to explore</span>
               </div>
             </div>
           </div>

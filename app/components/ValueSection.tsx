@@ -84,14 +84,14 @@ export function ValueSection() {
   return (
     <section className="py-24 md:py-32 bg-[#0a0e1a]">
       <div className="max-w-6xl mx-auto px-6">
-        <h2 className="font-heading text-2xl md:text-3xl font-light text-center text-foreground-bright mb-16">
+        <h2 className="font-heading text-2xl md:text-3xl font-light text-center text-foreground-bright mb-10 md:mb-16">
           Core Capabilities
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {VALUES.map((value, index) => (
             <motion.div
               key={value.title}
-              className="p-8 bg-transparent border border-white/[0.08] rounded-sm"
+              className="p-6 md:p-8 bg-transparent border border-white/[0.08] rounded-sm"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}

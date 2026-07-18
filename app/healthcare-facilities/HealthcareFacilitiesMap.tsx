@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Navigation, MapPin as MapPinIcon, Phone, AlertCircle, Check } from "lucide-react";
+import { Navigation, MapPin as MapPinIcon, Phone, AlertCircle, Check, Ruler } from "lucide-react";
 
 interface Facility {
   id: string;
@@ -14,7 +14,7 @@ interface Facility {
   lng: number;
   address: string;
   phone: string;
-  distance?: number;
+  distance?: number; // in kilometers
   waitTime?: string;
   services: string[];
   rating?: number;
@@ -37,28 +37,65 @@ const facilityTypes = [
   { value: "emergency", label: "Emergency Dept", icon: "map-pin", color: "#ec4899" },
 ] as const;
 
+// Distance filter options (in kilometers). `null` = no limit.
+const distanceFilters: { value: string; label: string; km: number | null }[] = [
+  { value: "all", label: "Any distance", km: null },
+  { value: "0.5", label: "Within 500 m", km: 0.5 },
+  { value: "1", label: "Within 1 km", km: 1 },
+  { value: "2", label: "Within 2 km", km: 2 },
+  { value: "5", label: "Within 5 km", km: 5 },
+  { value: "10", label: "Within 10 km", km: 10 },
+];
+
+// Reference point used to place hardcoded demo facilities (Ludhiana, Punjab).
+// Swap this out once real geocoding / userLocation data is wired up.
+const DEFAULT_CENTER = { lat: 30.901, lng: 75.8573 };
+
+// Hardcoded sample hospitals for now, until live facility data is connected.
+const DEFAULT_FACILITIES: Facility[] = [
+  {
+    id: "neelam-hospital",
+    name: "Neelam Hospital",
+    type: "hospital",
+    lat: DEFAULT_CENTER.lat + 0.0009, // ~100 m north of reference point
+    lng: DEFAULT_CENTER.lng,
+    address: "Neelam Hospital, Ludhiana, Punjab",
+    phone: "+91 161 500 0000",
+    distance: 0.1,
+    waitTime: "10 mins",
+    services: ["Emergency", "General Medicine", "Surgery"],
+    rating: 4.3,
+    open24h: true,
+  },
+  {
+    id: "gyan-sagar-hospital",
+    name: "Gyan Sagar Hospital",
+    type: "hospital",
+    lat: DEFAULT_CENTER.lat + 0.018, // ~2 km north of reference point
+    lng: DEFAULT_CENTER.lng,
+    address: "Gyan Sagar Hospital, Ludhiana, Punjab",
+    phone: "+91 161 500 1111",
+    distance: 2,
+    waitTime: "20 mins",
+    services: ["Emergency", "Cardiology", "Orthopedics"],
+    rating: 4.1,
+    open24h: true,
+  },
+];
+
 function getMarkerSvg(type: Facility["type"]): string {
   switch (type) {
-    case "hospital":
-      return '<path d="M12 2v20M17 7H7"/><path d="M19 17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/>';
     case "urgent-care":
       return '<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>';
     case "pharmacy":
       return '<path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 18v-8"/><path d="M6 12h12"/>';
     case "clinic":
       return '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>';
+    case "hospital":
+    case "emergency":
     default:
       return '<path d="M12 2v20M17 7H7"/><path d="M19 17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/>';
   }
-}
-
-function getHospitalMarkerSvg(): string {
-  return `
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="14" fill="#3b82f6" stroke="white" stroke-width="2"/>
-      <path d="M16 8V22M22 16H10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
-  `;
 }
 
 function FacilityMarker({
@@ -73,26 +110,30 @@ function FacilityMarker({
   const typeInfo = facilityTypes.find((t) => t.value === facility.type);
   const color = typeInfo?.color || "#6b7280";
   const isSelected = selectedFacility?.id === facility.id;
+  const isHospital = facility.type === "hospital" || facility.type === "emergency";
 
-  // Custom hospital marker with distinctive icon
+  // Hospitals get a distinctive, larger marker (bigger circle, bold "+" cross,
+  // ring + pulse animation) so they stand out clearly from other facility types.
   const icon = useMemo(() => {
-    if (facility.type === "hospital") {
+    if (isHospital) {
       return L.divIcon({
         className: `custom-marker hospital-marker ${isSelected ? "selected" : ""}`,
         html: `
-          <div class="marker-wrapper" style="--marker-color: ${color}">
+          <div class="marker-wrapper hospital" style="--marker-color: ${color}">
             <div class="marker-pulse"></div>
-            <div class="marker-icon">
-              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="16" r="13" fill="${color}" stroke="white" stroke-width="2"/>
-                <path d="M16 7V25M23 16H9" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <div class="marker-ring"></div>
+            <div class="marker-icon hospital-icon">
+              <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="14" fill="${color}" stroke="white" stroke-width="2.5"/>
+                <rect x="14.25" y="7" width="3.5" height="18" rx="1" fill="white"/>
+                <rect x="7" y="14.25" width="18" height="3.5" rx="1" fill="white"/>
               </svg>
             </div>
           </div>
         `,
-        iconSize: [44, 44],
-        iconAnchor: [22, 44],
-        popupAnchor: [0, -44],
+        iconSize: [46, 46],
+        iconAnchor: [23, 46],
+        popupAnchor: [0, -46],
       });
     }
     return L.divIcon({
@@ -111,7 +152,7 @@ function FacilityMarker({
       iconAnchor: [20, 40],
       popupAnchor: [0, -40],
     });
-  }, [facility.id, facility.type, color, isSelected]);
+  }, [facility.id, facility.type, color, isSelected, isHospital]);
 
   return (
     <Marker
@@ -182,7 +223,11 @@ function FacilityPopup({
         {facility.distance !== undefined && (
           <div className="flex items-center gap-2 text-sm text-foreground-muted">
             <Navigation className="w-4 h-4 flex-shrink-0" style={{ color: "#6b7280" }} />
-            <span>{facility.distance.toFixed(1)} miles away</span>
+            <span>
+              {facility.distance < 1
+                ? `${Math.round(facility.distance * 1000)} m away`
+                : `${facility.distance.toFixed(1)} km away`}
+            </span>
           </div>
         )}
 
@@ -266,45 +311,84 @@ export function HealthcareFacilitiesMap({
   selectedFacility: Facility | null;
   onFacilityClick: (facility: Facility) => void;
 }) {
-  const mapCenter = userLocation
-    ? [userLocation.lat, userLocation.lng] as [number, number]
-    : [40.7589, -73.9851] as [number, number];
-  const mapZoom = userLocation ? 13 : 12;
+  // Distance filter state - lives here so the map stays self-contained.
+  const [distanceFilter, setDistanceFilter] = useState<string>("all");
 
-  const filteredFacilities = facilities.filter((f) => selectedType === "all" || f.type === selectedType);
+  // Fall back to hardcoded demo hospitals when no live facility data is passed in yet.
+  const sourceFacilities = facilities && facilities.length > 0 ? facilities : DEFAULT_FACILITIES;
+
+  const mapCenter = userLocation
+    ? ([userLocation.lat, userLocation.lng] as [number, number])
+    : ([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng] as [number, number]);
+  const mapZoom = userLocation ? 13 : 14;
+
+  const activeDistanceKm = distanceFilters.find((d) => d.value === distanceFilter)?.km ?? null;
+
+  const filteredFacilities = useMemo(() => {
+    return sourceFacilities
+      .filter((f) => selectedType === "all" || f.type === selectedType)
+      .filter((f) => activeDistanceKm === null || (f.distance !== undefined && f.distance <= activeDistanceKm))
+      // Closest first, so the filter genuinely surfaces nearby options.
+      .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+  }, [sourceFacilities, selectedType, activeDistanceKm]);
 
   return (
-    <MapContainer
-      center={mapCenter}
-      zoom={mapZoom}
-      className="w-full h-full rounded-2xl"
-      style={{ zIndex: 1 }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
-      />
+    <div className="relative w-full h-full">
+      {/* Distance filter control, floating over the map */}
+      <div
+        className="absolute top-3 right-3 z-[500] flex items-center gap-2 px-3 py-2 rounded-xl shadow-lg"
+        style={{
+          backgroundColor: "#0f1320",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+        }}
+      >
+        <Ruler className="w-4 h-4 flex-shrink-0" style={{ color: "#6b7280" }} />
+        <select
+          value={distanceFilter}
+          onChange={(e) => setDistanceFilter(e.target.value)}
+          className="bg-transparent text-sm font-medium outline-none cursor-pointer"
+          style={{ color: "#c8ccd4" }}
+        >
+          {distanceFilters.map((option) => (
+            <option key={option.value} value={option.value} style={{ backgroundColor: "#0f1320", color: "#c8ccd4" }}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {userLocation && (
-        <Marker position={[userLocation.lat, userLocation.lng] as [number, number]}>
-          <Popup>
-            <div className="p-2 text-center">
-              <p className="font-medium text-foreground-bright">Your Location</p>
-              <p className="text-sm text-foreground-muted">{userLocation.city}</p>
-            </div>
-          </Popup>
-        </Marker>
-      )}
-
-      {filteredFacilities.map((facility) => (
-        <FacilityMarker
-          key={facility.id}
-          facility={facility}
-          selectedFacility={selectedFacility}
-          onClick={() => onFacilityClick(facility)}
+      <MapContainer
+        center={mapCenter}
+        zoom={mapZoom}
+        className="w-full h-full rounded-2xl"
+        style={{ zIndex: 1 }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
-      ))}
-    </MapContainer>
+
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng] as [number, number]}>
+            <Popup>
+              <div className="p-2 text-center">
+                <p className="font-medium text-foreground-bright">Your Location</p>
+                <p className="text-sm text-foreground-muted">{userLocation.city}</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {filteredFacilities.map((facility) => (
+          <FacilityMarker
+            key={facility.id}
+            facility={facility}
+            selectedFacility={selectedFacility}
+            onClick={() => onFacilityClick(facility)}
+          />
+        ))}
+      </MapContainer>
+    </div>
   );
 }

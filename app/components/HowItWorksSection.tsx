@@ -24,7 +24,7 @@ export function HowItWorksSection() {
   return (
     <section className="py-24 md:py-32 bg-[#0a0e1a]">
       <div className="max-w-3xl mx-auto px-6 relative">
-        <h2 className="font-heading text-2xl md:text-3xl font-light text-center text-foreground-bright mb-16">
+        <h2 className="font-heading text-2xl md:text-3xl font-light text-center text-foreground-bright mb-10 md:mb-16">
           How It Works
         </h2>
         
@@ -45,7 +45,7 @@ export function HowItWorksSection() {
                   delay: index * 0.15,
                 }}
               >
-                <div className="font-heading text-4xl md:text-5xl font-light text-white/[0.06] mr-8 w-16 flex-shrink-0 text-right">
+                <div className="font-heading text-3xl md:text-4xl lg:text-5xl font-light text-white/[0.06] mr-8 w-16 flex-shrink-0 text-right">
                   {step.number}
                 </div>
                 <div className="pt-2 md:pt-3">
